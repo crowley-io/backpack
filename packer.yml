@@ -1,0 +1,13 @@
+---
+backpack:
+  pre-hooks:
+    - id
+  post-hooks:
+    - apt-get clean
+    - rm /tmp/backpack/foo
+  execute:
+    - id
+    - ls -la ~/
+    - whoami
+    - touch /tmp/backpack/foo
+    - ls /tmp/backpack
