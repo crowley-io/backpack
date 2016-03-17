@@ -1,9 +1,11 @@
 ---
 backpack:
   pre-hooks:
-    - id
+    - apt-get update
+    - apt-get install nano
   post-hooks:
     - apt-get clean
+    - rm -rf /var/lib/apt/lists/*
     - rm /tmp/backpack/foo
   execute:
     - id
