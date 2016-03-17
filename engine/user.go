@@ -10,15 +10,19 @@ import (
 )
 
 const (
+	// DefaultUser define the user name
 	DefaultUser = "crowley"
 	// Errors message
 	noUserMatch = "no matching entries in passwd file"
 )
 
 var (
+	// ErrUnexpectedUser is an error returned when the user already exists.
 	ErrUnexpectedUser = errors.New("user already exists")
 )
 
+// CreateUser create a default user inside the container.
+// The UID will be returned.
 func CreateUser(gid int) (int, error) {
 
 	uid, err := UserID()

@@ -10,15 +10,19 @@ import (
 )
 
 const (
+	// DefaultGroup define the group name
 	DefaultGroup = "crowley"
 	// Errors message
 	noGroupMatch = "no matching entries in group file"
 )
 
 var (
+	// ErrUnexpectedGroup is an error returned when the group already exists.
 	ErrUnexpectedGroup = errors.New("group already exists")
 )
 
+// CreateGroup create a default group inside the container.
+// The GID will be returned.
 func CreateGroup() (int, error) {
 
 	gid, err := GroupID()

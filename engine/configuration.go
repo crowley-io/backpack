@@ -14,14 +14,17 @@ type Configuration struct {
 	}
 }
 
+// Prehooks returns a list of command hook to execute (as root) before.
 func (c Configuration) Prehooks() []string {
 	return c.Backpack.Prehooks
 }
 
+// Posthooks returns a list of command hook to execute (as root) after.
 func (c Configuration) Posthooks() []string {
 	return c.Backpack.Posthooks
 }
 
+// Execute returns a list of command to execute as required user.
 func (c Configuration) Execute() []string {
 	return c.Backpack.Execute
 }
