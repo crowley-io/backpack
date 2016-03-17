@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
-	"github.com/crowley-io/pack/install"
 )
 
 const (
 	// UserEnv is the environment variable name given by pack to define the user id.
-	UserEnv = install.UserEnv
+	UserEnv = "CROWLEY_PACK_USER"
 	// GroupEnv is the environment variable name given by pack to define the group id.
-	GroupEnv = install.GroupEnv
+	GroupEnv = "CROWLEY_PACK_GROUP"
 )
 
 var (
