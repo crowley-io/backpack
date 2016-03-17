@@ -27,7 +27,7 @@ func getConfigurationPathOption(app *cli.Cli) (path *string) {
 	path = app.String(cli.StringOpt{
 		Name:  "c configuration",
 		Value: "packer.yml",
-		Desc:  "Configuration file",
+		Desc:  "Configuration file.",
 	})
 
 	return
@@ -39,13 +39,13 @@ func setRunCommandConfiguration(run *cli.Cmd) {
 
 	command := run.String(cli.StringArg{
 		Name:      "COMMAND",
-		Desc:      "Command to execute",
+		Desc:      "Command to execute.",
 		HideValue: true,
 	})
 
 	args := run.Strings(cli.StringsArg{
 		Name:      "ARG",
-		Desc:      "Command's arguments",
+		Desc:      "Command's arguments.",
 		Value:     nil,
 		HideValue: true,
 	})
