@@ -16,31 +16,31 @@ func handle(c engine.Configuration) int {
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrCreateGroup
+		return exitErrCreateGroup
 	}
 
 	if _, err = engine.CreateUser(gid); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrCreateUser
+		return exitErrCreateUser
 	}
 
 	// Execute pre-hooks.
 	if err := engine.Launch(c.Prehooks(), createHookCmd); err != nil {
-		return ErrPreHookRuntime
+		return exitErrPreHookRuntime
 	}
 
 	// Execute every command as required user.
 	if err := engine.Launch(c.Execute(), createRunCmd); err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot execute: ", err)
-		return ErrExecuteRuntime
+		return exitErrExecuteRuntime
 	}
 
 	// Execute post-hooks.
 	if err := engine.Launch(c.Posthooks(), createHookCmd); err != nil {
-		return ErrPostHookRuntime
+		return exitErrPostHookRuntime
 	}
 
-	return Success
+	return exitSuccess
 }
 
 func execute(command string, args []string) int {
@@ -49,35 +49,35 @@ func execute(command string, args []string) int {
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrUndefinedGroupEnv
+		return exitErrUndefinedGroupEnv
 	}
 
 	uid, err := engine.UserID()
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrUndefinedUserEnv
+		return exitErrUndefinedUserEnv
 	}
 
-	if err := engine.Setup(uid, gid); err != nil {
+	if err = engine.Setup(uid, gid); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrSetupUser
+		return exitErrSetupUser
 	}
 
 	path, err := exec.LookPath(command)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return ErrLookPath
+		return exitErrLookPath
 	}
 
 	args = append([]string{command}, args...)
 
 	if err = syscall.Exec(path, args, os.Environ()); err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot execute: ", err)
-		return ErrSyscallExec
+		return exitErrSyscallExec
 	}
 
-	return 0
+	return exitSuccess
 }
 
 func createHookCmd(cmd string) *exec.Cmd {

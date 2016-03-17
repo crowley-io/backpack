@@ -9,9 +9,26 @@ import (
 	"github.com/jawher/mow.cli"
 )
 
+// Application informations.
 const (
 	appName = "crowley-backpack"
-	appDesc = "User management for crowley-pack build system."
+	appDesc = "User management and command invoker for crowley-pack build system."
+)
+
+// Exit error codes
+const (
+	exitSuccess = iota
+	exitErrParseConfiguration
+	exitErrPreHookRuntime
+	exitErrPostHookRuntime
+	exitErrExecuteRuntime
+	exitErrCreateGroup
+	exitErrCreateUser
+	exitErrUndefinedGroupEnv
+	exitErrUndefinedUserEnv
+	exitErrSetupUser
+	exitErrLookPath
+	exitErrSyscallExec
 )
 
 func init() {
@@ -33,18 +50,20 @@ func main() {
 
 		if *version {
 			fmt.Printf("%s %s\n", appName, engine.Version)
-			cli.Exit(Success)
+			cli.Exit(exitSuccess)
 		}
 
 		conf, err := engine.ParseConfiguration(*path)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			cli.Exit(ErrParseConfiguration)
+			cli.Exit(exitErrParseConfiguration)
 		}
 
 		cli.Exit(handle(*conf))
 	}
 
-	backpack.Run(os.Args)
+	if err := backpack.Run(os.Args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 }
