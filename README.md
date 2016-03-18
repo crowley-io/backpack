@@ -2,7 +2,7 @@
 
 A wrapper for pack which handle Packer's environment variables in order to change directory, perform an user switch and then, execute all required command lines...
 
-Also, it helps reduce boilerplate code and configuration for developers and/or sysadmins by using only a `yaml` file.
+Also, it helps reduce boilerplate code and configuration scripts for developers and/or sysadmins by using only a `yaml` configuration file.
 
 ## Usage
 

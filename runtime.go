@@ -14,7 +14,7 @@ import (
 //   - After that, it will launch itself - also in a child process - in order to execute every command defined in
 //     the configuration file. Each command will be executed as the user created in the first step...
 //   - Finally, if any post-hooks are defined, it will execute them in a child process.
-func handle(c engine.Configuration) int {
+func handle(path string) int {
 
 	// Create user and group.
 	gid, err := engine.CreateGroup()
@@ -27,6 +27,25 @@ func handle(c engine.Configuration) int {
 	if _, err = engine.CreateUser(gid); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return exitErrCreateUser
+	}
+
+	// Change working directory
+	dir, err := engine.WorkingDirectory()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrUndefinedDirectoryEnv
+	}
+
+	if err = os.Chdir(dir); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrWorkingDirectory
+	}
+
+	// Parse configuration
+	c, err := engine.ParseConfiguration(path)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrParseConfiguration
 	}
 
 	// Execute pre-hooks.

@@ -24,8 +24,10 @@ const (
 	exitErrExecuteRuntime
 	exitErrCreateGroup
 	exitErrCreateUser
+	exitErrWorkingDirectory
 	exitErrUndefinedGroupEnv
 	exitErrUndefinedUserEnv
+	exitErrUndefinedDirectoryEnv
 	exitErrSetupUser
 	exitErrLookPath
 	exitErrSyscallExec
@@ -53,14 +55,8 @@ func main() {
 			cli.Exit(exitSuccess)
 		}
 
-		conf, err := engine.ParseConfiguration(*path)
+		cli.Exit(handle(*path))
 
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			cli.Exit(exitErrParseConfiguration)
-		}
-
-		cli.Exit(handle(*conf))
 	}
 
 	if err := backpack.Run(os.Args); err != nil {
