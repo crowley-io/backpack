@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-type App struct {
+type app struct {
 	name        string
 	description string
 	version     string
 	Handler     func(args []string) int
 }
 
-func NewApp(name, description, version string) *App {
-	return &App{
+func newApp(name, description, version string) *app {
+	return &app{
 		name:        name,
 		description: description,
 		version:     version,
@@ -23,11 +23,11 @@ func NewApp(name, description, version string) *App {
 	}
 }
 
-func (e *App) Version(w io.Writer) {
+func (e *app) Version(w io.Writer) {
 	fmt.Fprintf(w, "%s %s\n", e.name, e.version)
 }
 
-func (e *App) Usage(w io.Writer) {
+func (e *app) Usage(w io.Writer) {
 
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "Usage: %s command [args]\n", e.name)
@@ -45,7 +45,7 @@ func (e *App) Usage(w io.Writer) {
 
 }
 
-func (e *App) Run(args []string) {
+func (e *app) Run(args []string) {
 
 	if len(args) < 2 {
 		e.Usage(os.Stderr)

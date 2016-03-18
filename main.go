@@ -26,7 +26,7 @@ func init() {
 
 func main() {
 
-	backpack := NewApp(
+	backpack := newApp(
 		"crowley-backpack", "User management and command invoker for crowley-pack build system.", engine.Version,
 	)
 
