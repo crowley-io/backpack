@@ -1,0 +1,11 @@
+---
+backpack:
+  pre-hooks:
+    - foo
+    - bar
+  post-hooks:
+    - fuu
+    - beer
+  execute:
+    - make
+    - make test
