@@ -12,14 +12,40 @@ import (
 const (
 	// DefaultGroup define the group name
 	DefaultGroup = "crowley"
-	// Errors message
-	noGroupMatch = "no matching entries in group file"
 )
 
 var (
 	// ErrUnexpectedGroup is an error returned when the group already exists.
 	ErrUnexpectedGroup = errors.New("group already exists")
 )
+
+// NoGroupLookup will check if the given gid or group name doesn't exists.
+func NoGroupLookup(gid int) error {
+
+	// Get operating system-specific group reader-closer.
+	group, err := libuser.GetGroup()
+	if err != nil {
+		return err
+	}
+	defer group.Close()
+
+	// Get the groups.
+	groups, err := libuser.ParseGroupFilter(group, func(g libuser.Group) bool {
+		return g.Gid == gid || g.Name == DefaultGroup
+	})
+
+	// Check if an error has occurred.
+	if err != nil {
+		return err
+	}
+
+	// Check if no groups entries found.
+	if len(groups) != 0 {
+		return ErrUnexpectedGroup
+	}
+
+	return nil
+}
 
 // CreateGroup create a default group inside the container.
 // The GID will be returned.
@@ -31,13 +57,7 @@ func CreateGroup() (int, error) {
 		return -1, err
 	}
 
-	_, err = libuser.LookupGid(gid)
-
-	if err == nil {
-		return -1, ErrUnexpectedGroup
-	}
-
-	if err == nil && err.Error() != noGroupMatch {
+	if err = NoGroupLookup(gid); err != nil {
 		return -1, err
 	}
 
