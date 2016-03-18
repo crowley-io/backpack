@@ -1,27 +1,31 @@
 # backpack
 
-A wrapper for pack which handle Packer's environment variables in order to change directory, perform an user switch and then, execute all required command lines...
+A wrapper for pack which handle **crowley pack**'s environment variables in order to change directory, perform an user switch and then, execute the given command line...
 
-Also, it helps reduce boilerplate code and configuration scripts for developers and/or sysadmins by using only a `yaml` configuration file.
+Also, it helps reduce boilerplate code and configuration for developers and/or sysadmins.
+
+> **NOTE**: You can execute multiple command using: `bash -c "cmd1 && cmd2"`
 
 ## Usage
 
 ```console
-backpack [-c packer.yml]
+Usage: crowley-backpack command [args]
+       crowley-backpack --version
+
+User management and command invoker for crowley-pack build system.
+
+Arguments:
+  command      Command to execute
+  args         Command's arguments
+
+Options:
+  -h, --help       Print usage and quits
+  -v, --version    Print version information and quits
 ```
 
-## Configuration
+**Example:**
 
-```yaml
-backpack:
-  pre-hooks:
-    - apt-get update
-    - apt-get install foo
-  execute:
-    - make
-  post-hooks:
-    - make install
-```
+`crowley-backpack make foo`
 
 ## Inspirations
 
@@ -31,9 +35,7 @@ backpack:
 
 Name                           | License
 -------------------------------|----------
-github.com/jawher/mow.cli      | `MIT`
 github.com/opencontainers/runc | `Apache 2.0`
-gopkg.in/yaml.v2               | `LGPL v3`
 
 ## License
 
