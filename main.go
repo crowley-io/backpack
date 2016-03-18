@@ -6,30 +6,15 @@ import (
 	"runtime"
 
 	"github.com/crowley-io/backpack/engine"
-	"github.com/jawher/mow.cli"
-)
-
-// Application informations.
-const (
-	appName = "crowley-backpack"
-	appDesc = "User management and command invoker for crowley-pack build system."
 )
 
 // Exit error codes
 const (
 	exitSuccess = iota
-	exitErrParseConfiguration
-	exitErrPreHookRuntime
-	exitErrPostHookRuntime
-	exitErrExecuteRuntime
 	exitErrCreateGroup
 	exitErrCreateUser
 	exitErrWorkingDirectory
-	exitErrUndefinedGroupEnv
-	exitErrUndefinedUserEnv
-	exitErrUndefinedDirectoryEnv
 	exitErrSetupUser
-	exitErrLookPath
 	exitErrSyscallExec
 )
 
@@ -41,25 +26,55 @@ func init() {
 
 func main() {
 
-	backpack := cli.App(appName, appDesc)
+	backpack := NewApp(
+		"crowley-backpack", "User management and command invoker for crowley-pack build system.", engine.Version,
+	)
 
-	version := getBasicOption(backpack)
-	path := getConfigurationPathOption(backpack)
+	backpack.Handler = handle
+	backpack.Run(os.Args)
 
-	backpack.Command("run", "Run a command with another user and group ID.", setRunCommandConfiguration)
+}
 
-	backpack.Action = func() {
+func handle(args []string) int {
 
-		if *version {
-			fmt.Printf("%s %s\n", appName, engine.Version)
-			cli.Exit(exitSuccess)
-		}
+	// Create user and group.
+	gid, err := engine.CreateGroup()
 
-		cli.Exit(handle(*path))
-
-	}
-
-	if err := backpack.Run(os.Args); err != nil {
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		return exitErrCreateGroup
 	}
+
+	uid, err := engine.CreateUser(gid)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrCreateUser
+	}
+
+	// Change working directory
+	dir, err := engine.WorkingDirectory()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrWorkingDirectory
+	}
+
+	if err = os.Chdir(dir); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrWorkingDirectory
+	}
+
+	// Switch to user.
+	if err = engine.Setup(uid, gid); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitErrSetupUser
+	}
+
+	// Execute given command.
+	if err = engine.Launch(args); err != nil {
+		fmt.Fprintln(os.Stderr, "Execution error: ", err)
+		return exitErrSyscallExec
+	}
+
+	return exitSuccess
 }
