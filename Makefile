@@ -1,4 +1,4 @@
-VERSION=0.1.0
+VERSION=0.1.1
 NAME=backpack
 ORGANIZATION=crowley-io
 PACKAGE=github.com/${ORGANIZATION}/${NAME}
@@ -11,6 +11,8 @@ ARTIFACTS = \
 
 UPLOAD_CMD = github-release upload --user ${GITHUB_USER} --repo ${GITHUB_REPO} --tag "v${VERSION}" \
 	--name ${FILE} --file ${FILE}
+
+LDFLAGS="-X ${PACKAGE}/engine.Version=v${VERSION}"
 
 all: ${NAME}
 
@@ -28,7 +30,7 @@ lint:
 	golint ./engine
 
 ${NAME}:
-	go build -ldflags "-X ${PACKAGE}/engine.Version=v${VERSION}" -o ${NAME}
+	go build -ldflags ${LDFLAGS} -o ${NAME}
 
 clean:
 	rm -rf ${NAME}
@@ -43,6 +45,6 @@ release: artifacts
 	$(foreach FILE,$(ARTIFACTS),$(UPLOAD_CMD);)
 
 artifacts:
-	gox -osarch="linux/amd64" -output="crowley-${NAME}_{{.OS}}-{{.Arch}}"
+	gox -osarch="linux/amd64" -ldflags ${LDFLAGS} -output="crowley-${NAME}_{{.OS}}-{{.Arch}}"
 
 .PHONY: clean ${NAME} install artifacts test style lint release
