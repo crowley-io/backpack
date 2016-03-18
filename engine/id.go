@@ -19,20 +19,24 @@ const (
 var (
 	// ErrUndefinedUserEnv is an error returned when the user environment variable is undefined.
 	ErrUndefinedUserEnv = fmt.Errorf("'%s' environment variable is undefined", UserEnv)
+	// ErrUserEnvSyntaxError is an error returned when the user environment variable has invalid syntax.
+	ErrUserEnvSyntaxError = fmt.Errorf("'%s' environment variable has invalid syntax", GroupEnv)
 	// ErrUndefinedGroupEnv is an error returned when the group environment variable is undefined.
 	ErrUndefinedGroupEnv = fmt.Errorf("'%s' environment variable is undefined", GroupEnv)
+	// ErrGroupEnvSyntaxError is an error returned when the group environment variable has invalid syntax.
+	ErrGroupEnvSyntaxError = fmt.Errorf("'%s' environment variable has invalid syntax", GroupEnv)
 	// ErrUndefinedDirectoryEnv is an error returned when the directory environment variable is undefined.
 	ErrUndefinedDirectoryEnv = fmt.Errorf("'%s' environment variable is undefined", DirectoryEnv)
 )
 
 // GroupID returns the required group's id for this process.
 func GroupID() (int, error) {
-	return parseID(GroupEnv, ErrUndefinedGroupEnv)
+	return parseID(GroupEnv, ErrUndefinedGroupEnv, ErrGroupEnvSyntaxError)
 }
 
 // UserID returns the required user's id for this process.
 func UserID() (int, error) {
-	return parseID(UserEnv, ErrUndefinedUserEnv)
+	return parseID(UserEnv, ErrUndefinedUserEnv, ErrUserEnvSyntaxError)
 }
 
 // WorkingDirectory returns the required working directory for this process.
@@ -47,18 +51,17 @@ func WorkingDirectory() (string, error) {
 	return s, nil
 }
 
-func parseID(env string, err error) (int, error) {
+func parseID(env string, errUndef, errSyntax error) (int, error) {
 
 	s := os.Getenv(env)
 
 	if s == "" {
-		return 0, err
+		return 0, errUndef
 	}
 
 	id, err := parseInt(s)
-
 	if err != nil {
-		return 0, err
+		return 0, errSyntax
 	}
 
 	return id, nil
