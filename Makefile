@@ -34,7 +34,7 @@ clean:
 	rm -rf ${NAME}
 
 install: ${NAME}
-	install -o root -g root -m 0755 pack /usr/local/bin/crowley-${NAME}
+	install -o root -g root -m 0755 ${NAME} /usr/local/bin/crowley-${NAME}
 
 release: artifacts
 	git tag "v${VERSION}" && git push --tags
