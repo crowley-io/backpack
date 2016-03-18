@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"strconv"
 
@@ -19,32 +20,26 @@ var (
 	ErrUnexpectedUser = errors.New("user already exists")
 )
 
-// NoUserLookup will check if the given uid or user name doesn't exists.
-func NoUserLookup(uid int) error {
+func noUserLookup(uid int) error {
 
-	// Get operating system-specific passwd reader-closer.
-	passwd, err := libuser.GetPasswd()
-	if err != nil {
-		return err
-	}
-	defer passwd.Close()
-
-	// Get the users.
-	users, err := libuser.ParsePasswdFilter(passwd, func(u libuser.User) bool {
-		return u.Uid == uid || u.Name == DefaultUser
-	})
-
-	// Check if an error has occurred.
-	if err != nil {
-		return err
+	reader := func() (io.ReadCloser, error) {
+		return libuser.GetPasswd()
 	}
 
-	// Check if no users entries found.
-	if len(users) != 0 {
-		return ErrUnexpectedUser
+	parser := func(r io.Reader) error {
+
+		users, err := libuser.ParsePasswdFilter(r, func(u libuser.User) bool {
+			return u.Uid == uid || u.Name == DefaultUser
+		})
+
+		if err == nil && len(users) != 0 {
+			return ErrUnexpectedGroup
+		}
+
+		return nil
 	}
 
-	return nil
+	return noLookup(reader, parser)
 }
 
 // CreateUser create a default user inside the container.
@@ -57,7 +52,7 @@ func CreateUser(gid int) (int, error) {
 		return -1, err
 	}
 
-	if err = NoUserLookup(uid); err != nil {
+	if err = noUserLookup(uid); err != nil {
 		return -1, err
 	}
 

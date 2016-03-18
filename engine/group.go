@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"strconv"
 
@@ -19,32 +20,26 @@ var (
 	ErrUnexpectedGroup = errors.New("group already exists")
 )
 
-// NoGroupLookup will check if the given gid or group name doesn't exists.
-func NoGroupLookup(gid int) error {
+func noGroupLookup(gid int) error {
 
-	// Get operating system-specific group reader-closer.
-	group, err := libuser.GetGroup()
-	if err != nil {
-		return err
-	}
-	defer group.Close()
-
-	// Get the groups.
-	groups, err := libuser.ParseGroupFilter(group, func(g libuser.Group) bool {
-		return g.Gid == gid || g.Name == DefaultGroup
-	})
-
-	// Check if an error has occurred.
-	if err != nil {
-		return err
+	reader := func() (io.ReadCloser, error) {
+		return libuser.GetGroup()
 	}
 
-	// Check if no groups entries found.
-	if len(groups) != 0 {
-		return ErrUnexpectedGroup
+	parser := func(r io.Reader) error {
+
+		groups, err := libuser.ParseGroupFilter(r, func(g libuser.Group) bool {
+			return g.Gid == gid || g.Name == DefaultGroup
+		})
+
+		if err == nil && len(groups) != 0 {
+			return ErrUnexpectedGroup
+		}
+
+		return nil
 	}
 
-	return nil
+	return noLookup(reader, parser)
 }
 
 // CreateGroup create a default group inside the container.
@@ -57,7 +52,7 @@ func CreateGroup() (int, error) {
 		return -1, err
 	}
 
-	if err = NoGroupLookup(gid); err != nil {
+	if err = noGroupLookup(gid); err != nil {
 		return -1, err
 	}
 
