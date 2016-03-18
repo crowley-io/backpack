@@ -17,7 +17,7 @@ var (
 	ErrExecUIDParamMatch = errors.New("uid doesn't match with given parameters")
 )
 
-func getUserPaths() (groupPath, passwdPath string, err error) {
+func getUserPaths() (passwdPath, groupPath string, err error) {
 
 	if passwdPath, err = user.GetPasswdPath(); err != nil {
 		return "", "", err
@@ -32,7 +32,7 @@ func getUserPaths() (groupPath, passwdPath string, err error) {
 
 func getUserExec(uid, gid int) (*user.ExecUser, error) {
 
-	id := fmt.Sprintf("%d:%d", uid, gid)
+	id := fmt.Sprintf("%s:%s", DefaultUser, DefaultGroup)
 
 	// Set up defaults.
 	defaultExecUser := user.ExecUser{
