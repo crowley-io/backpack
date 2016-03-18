@@ -2,14 +2,10 @@
 backpack:
   pre-hooks:
     - apt-get update
-    - apt-get install nano
+    - apt-get install make
   post-hooks:
     - apt-get clean
     - rm -rf /var/lib/apt/lists/*
-    - rm /tmp/backpack/foo
   execute:
-    - id
-    - ls -la ~/
-    - whoami
-    - touch /tmp/backpack/foo
-    - ls /tmp/backpack
+    - make
+    - make test
