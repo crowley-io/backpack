@@ -67,6 +67,18 @@ func TestWorkingDirectoryWithUndefinedEnv(t *testing.T) {
 
 }
 
+func setEnv(t *testing.T, key, value string) {
+	if err := os.Setenv(key, value); err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+}
+
+func unsetEnv(t *testing.T, key string) {
+	if err := os.Unsetenv(key); err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+}
+
 func checkIDMatch(t *testing.T, key string, e int, callback func() (int, error)) {
 
 	setEnv(t, key, fmt.Sprint(e))
