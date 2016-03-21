@@ -7,17 +7,23 @@ import (
 // ChangeDirectory will change the current working directory to the required one.
 // Also, it will update the "PWD" environment variable.
 func ChangeDirectory() error {
+	return changeDirectory(WorkingDirectory, os.Chdir, os.Setenv)
+}
 
-	dir, err := WorkingDirectory()
+func changeDirectory(directory func() (path string, err error),
+	chdir func(path string) error,
+	setenv func(key, value string) error) error {
+
+	dir, err := directory()
 	if err != nil {
 		return err
 	}
 
-	if err = os.Chdir(dir); err != nil {
+	if err = chdir(dir); err != nil {
 		return err
 	}
 
-	if err = os.Setenv("PWD", dir); err != nil {
+	if err = setenv("PWD", dir); err != nil {
 		return err
 	}
 
