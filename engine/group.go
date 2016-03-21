@@ -3,7 +3,6 @@ package engine
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os/exec"
 	"strconv"
 
@@ -22,24 +21,24 @@ var (
 
 func noGroupLookup(gid int) error {
 
-	reader := func() (io.ReadCloser, error) {
-		return libuser.GetGroup()
+	path, err := libuser.GetGroupPath()
+	if err != nil {
+		return err
 	}
 
-	parser := func(r io.Reader) error {
+	groups, err := libuser.ParseGroupFileFilter(path, func(g libuser.Group) bool {
+		return g.Gid == gid || g.Name == DefaultGroup
+	})
 
-		groups, err := libuser.ParseGroupFilter(r, func(g libuser.Group) bool {
-			return g.Gid == gid || g.Name == DefaultGroup
-		})
-
-		if err == nil && len(groups) != 0 {
-			return ErrUnexpectedGroup
-		}
-
-		return nil
+	if err != nil {
+		return err
 	}
 
-	return noLookup(reader, parser)
+	if err == nil && len(groups) != 0 {
+		return ErrUnexpectedGroup
+	}
+
+	return nil
 }
 
 // CreateGroup create a default group inside the container.

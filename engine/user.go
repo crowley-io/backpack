@@ -3,7 +3,6 @@ package engine
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os/exec"
 	"strconv"
 
@@ -22,24 +21,24 @@ var (
 
 func noUserLookup(uid int) error {
 
-	reader := func() (io.ReadCloser, error) {
-		return libuser.GetPasswd()
+	path, err := libuser.GetPasswdPath()
+	if err != nil {
+		return err
 	}
 
-	parser := func(r io.Reader) error {
+	users, err := libuser.ParsePasswdFileFilter(path, func(u libuser.User) bool {
+		return u.Uid == uid || u.Name == DefaultUser
+	})
 
-		users, err := libuser.ParsePasswdFilter(r, func(u libuser.User) bool {
-			return u.Uid == uid || u.Name == DefaultUser
-		})
-
-		if err == nil && len(users) != 0 {
-			return ErrUnexpectedGroup
-		}
-
-		return nil
+	if err != nil {
+		return err
 	}
 
-	return noLookup(reader, parser)
+	if err == nil && len(users) != 0 {
+		return ErrUnexpectedUser
+	}
+
+	return nil
 }
 
 // CreateUser create a default user inside the container.
