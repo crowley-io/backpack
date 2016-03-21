@@ -53,7 +53,7 @@ func TestLaunchWithLookpathError(t *testing.T) {
 	err := launch(args, lookpath, exec)
 
 	if err == nil {
-		t.Fatal("an error was expected error")
+		t.Fatal("an error was expected")
 	}
 
 	if err != e {
@@ -81,7 +81,7 @@ func TestLaunchWithExecError(t *testing.T) {
 	err := launch(args, lookpath, exec)
 
 	if err == nil {
-		t.Fatal("an error was expected error")
+		t.Fatal("an error was expected")
 	}
 
 	if err != e {
