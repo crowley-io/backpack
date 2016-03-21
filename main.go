@@ -53,13 +53,8 @@ func handle(args []string) int {
 	}
 
 	// Change working directory
-	dir, err := engine.WorkingDirectory()
+	err = engine.ChangeDirectory()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return exitErrWorkingDirectory
-	}
-
-	if err = os.Chdir(dir); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return exitErrWorkingDirectory
 	}
