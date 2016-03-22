@@ -19,6 +19,27 @@ var (
 	ErrUnexpectedGroup = errors.New("group already exists")
 )
 
+// CreateGroup create a default group inside the container.
+// The GID will be returned.
+func CreateGroup() (int, error) {
+
+	gid, err := GroupID()
+
+	if err != nil {
+		return -1, err
+	}
+
+	if err = noGroupLookup(gid); err != nil {
+		return -1, err
+	}
+
+	if err = addgroup(gid); err != nil {
+		return -1, err
+	}
+
+	return gid, nil
+}
+
 func noGroupLookup(gid int) error {
 
 	path, err := libuser.GetGroupPath()
@@ -39,27 +60,6 @@ func noGroupLookup(gid int) error {
 	}
 
 	return nil
-}
-
-// CreateGroup create a default group inside the container.
-// The GID will be returned.
-func CreateGroup() (int, error) {
-
-	gid, err := GroupID()
-
-	if err != nil {
-		return -1, err
-	}
-
-	if err = noGroupLookup(gid); err != nil {
-		return -1, err
-	}
-
-	if err = addgroup(gid); err != nil {
-		return -1, err
-	}
-
-	return gid, nil
 }
 
 func addgroup(gid int) error {

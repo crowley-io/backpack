@@ -19,6 +19,27 @@ var (
 	ErrUnexpectedUser = errors.New("user already exists")
 )
 
+// CreateUser create a default user inside the container.
+// The UID will be returned.
+func CreateUser(gid int) (int, error) {
+
+	uid, err := UserID()
+
+	if err != nil {
+		return -1, err
+	}
+
+	if err = noUserLookup(uid); err != nil {
+		return -1, err
+	}
+
+	if err = adduser(uid, gid); err != nil {
+		return -1, err
+	}
+
+	return uid, nil
+}
+
 func noUserLookup(uid int) error {
 
 	path, err := libuser.GetPasswdPath()
@@ -39,27 +60,6 @@ func noUserLookup(uid int) error {
 	}
 
 	return nil
-}
-
-// CreateUser create a default user inside the container.
-// The UID will be returned.
-func CreateUser(gid int) (int, error) {
-
-	uid, err := UserID()
-
-	if err != nil {
-		return -1, err
-	}
-
-	if err = noUserLookup(uid); err != nil {
-		return -1, err
-	}
-
-	if err = adduser(uid, gid); err != nil {
-		return -1, err
-	}
-
-	return uid, nil
 }
 
 func adduser(uid, gid int) error {
