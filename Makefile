@@ -1,4 +1,4 @@
-VERSION=0.1.1
+VERSION=0.1.2
 NAME=backpack
 ORGANIZATION=crowley-io
 PACKAGE=github.com/${ORGANIZATION}/${NAME}
