@@ -48,4 +48,4 @@ release: artifacts
 artifacts:
 	gox -osarch="linux/amd64" -ldflags ${LDFLAGS} -output="crowley-${NAME}_{{.OS}}-{{.Arch}}"
 
-.PHONY: clean ${NAME} install artifacts test style lint release coverage
+.PHONY: clean ${NAME} install artifacts test style lint release
