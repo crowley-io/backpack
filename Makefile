@@ -48,14 +48,4 @@ release: artifacts
 artifacts:
 	gox -osarch="linux/amd64" -ldflags ${LDFLAGS} -output="crowley-${NAME}_{{.OS}}-{{.Arch}}"
 
-coverage: engine/cover.out
-	@echo "mode: set" > $@ && cat $^ 2>/dev/null | grep -v mode: | sort -r | \
-		awk '{if($$1 != last) {print $$0;last=$$1}}' >> $@
-	go tool cover -html=$@ -o $@.html
-	@rm $^ 2>/dev/null || true
-	@rm $@ 2>/dev/null || true
-
-engine/cover.out:
-	go test -coverprofile=$@ ${PACKAGE}/engine
-
 .PHONY: clean ${NAME} install artifacts test style lint release coverage
