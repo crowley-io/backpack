@@ -3,7 +3,6 @@ package engine
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os/exec"
 	"strconv"
 
@@ -19,28 +18,6 @@ var (
 	// ErrUnexpectedGroup is an error returned when the group already exists.
 	ErrUnexpectedGroup = errors.New("group already exists")
 )
-
-func noGroupLookup(gid int) error {
-
-	reader := func() (io.ReadCloser, error) {
-		return libuser.GetGroup()
-	}
-
-	parser := func(r io.Reader) error {
-
-		groups, err := libuser.ParseGroupFilter(r, func(g libuser.Group) bool {
-			return g.Gid == gid || g.Name == DefaultGroup
-		})
-
-		if err == nil && len(groups) != 0 {
-			return ErrUnexpectedGroup
-		}
-
-		return nil
-	}
-
-	return noLookup(reader, parser)
-}
 
 // CreateGroup create a default group inside the container.
 // The GID will be returned.
@@ -61,6 +38,28 @@ func CreateGroup() (int, error) {
 	}
 
 	return gid, nil
+}
+
+func noGroupLookup(gid int) error {
+
+	path, err := libuser.GetGroupPath()
+	if err != nil {
+		return err
+	}
+
+	groups, err := libuser.ParseGroupFileFilter(path, func(g libuser.Group) bool {
+		return g.Gid == gid || g.Name == DefaultGroup
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if err == nil && len(groups) != 0 {
+		return ErrUnexpectedGroup
+	}
+
+	return nil
 }
 
 func addgroup(gid int) error {

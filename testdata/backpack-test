@@ -1,0 +1,41 @@
+#!/bin/bash
+
+EXPECTED_USER="crowley"
+EXPECTED_GROUP="crowley"
+
+function error() {
+  echo "$1" >&2
+}
+
+# Fail hard and fast
+set -eo pipefail
+
+# Prepare environment for backpack
+mkdir ${CROWLEY_PACK_DIRECTORY}
+chown ${CROWLEY_PACK_USER}:${CROWLEY_PACK_GROUP} ${CROWLEY_PACK_DIRECTORY}
+
+# Check if user is root
+if [ "$(id -u)" != "0" -o "$(id -g)" != "0" ]; then
+   error "This script must be run as root"
+   exit 1
+fi
+
+# Compile and launch backpack
+make >/dev/null
+make install >/dev/null
+crowley-backpack touch ${CROWLEY_PACK_OUTPUT}
+make clean >/dev/null
+
+# Check ownership of output artifacts, created by backpack.
+if [ "$(stat -c '%U' ${CROWLEY_PACK_DIRECTORY}/${CROWLEY_PACK_OUTPUT})" != "${EXPECTED_USER}" ]; then
+  ls -lh ${CROWLEY_PACK_DIRECTORY}
+  error "Invalid user for ${CROWLEY_PACK_DIRECTORY}/${CROWLEY_PACK_OUTPUT}: expected ${EXPECTED_USER}"
+  exit 1
+fi
+if [ "$(stat -c '%G' ${CROWLEY_PACK_DIRECTORY}/${CROWLEY_PACK_OUTPUT})" != "${EXPECTED_GROUP}" ]; then
+  ls -lh ${CROWLEY_PACK_DIRECTORY}
+  error "Invalid group for ${CROWLEY_PACK_DIRECTORY}/${CROWLEY_PACK_OUTPUT}: expected ${EXPECTED_GROUP}"
+  exit 1
+fi
+
+exit 0

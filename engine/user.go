@@ -3,7 +3,6 @@ package engine
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os/exec"
 	"strconv"
 
@@ -19,28 +18,6 @@ var (
 	// ErrUnexpectedUser is an error returned when the user already exists.
 	ErrUnexpectedUser = errors.New("user already exists")
 )
-
-func noUserLookup(uid int) error {
-
-	reader := func() (io.ReadCloser, error) {
-		return libuser.GetPasswd()
-	}
-
-	parser := func(r io.Reader) error {
-
-		users, err := libuser.ParsePasswdFilter(r, func(u libuser.User) bool {
-			return u.Uid == uid || u.Name == DefaultUser
-		})
-
-		if err == nil && len(users) != 0 {
-			return ErrUnexpectedGroup
-		}
-
-		return nil
-	}
-
-	return noLookup(reader, parser)
-}
 
 // CreateUser create a default user inside the container.
 // The UID will be returned.
@@ -61,6 +38,28 @@ func CreateUser(gid int) (int, error) {
 	}
 
 	return uid, nil
+}
+
+func noUserLookup(uid int) error {
+
+	path, err := libuser.GetPasswdPath()
+	if err != nil {
+		return err
+	}
+
+	users, err := libuser.ParsePasswdFileFilter(path, func(u libuser.User) bool {
+		return u.Uid == uid || u.Name == DefaultUser
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if err == nil && len(users) != 0 {
+		return ErrUnexpectedUser
+	}
+
+	return nil
 }
 
 func adduser(uid, gid int) error {

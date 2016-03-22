@@ -27,6 +27,16 @@ Options:
 
 `crowley-backpack make foo`
 
+## Testing
+
+You can run tests for backpack by using this command:
+
+```console
+make test
+```
+
+Note that test cases are run in a **Docker container**, so you need to install `docker` first.
+
 ## Inspirations
 
 * [`gosu`](https://github.com/tianon/gosu)
