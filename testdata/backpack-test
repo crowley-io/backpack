@@ -22,7 +22,8 @@ fi
 
 # Compile and launch backpack
 make >/dev/null
-./backpack touch ${CROWLEY_PACK_OUTPUT}
+make install >/dev/null
+crowley-backpack touch ${CROWLEY_PACK_OUTPUT}
 make clean >/dev/null
 
 # Check ownership of output artifacts, created by backpack.
