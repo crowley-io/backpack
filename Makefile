@@ -14,13 +14,14 @@ UPLOAD_CMD = github-release upload --user ${GITHUB_USER} --repo ${GITHUB_REPO} -
 
 LDFLAGS="-X ${PACKAGE}/engine.Version=v${VERSION}"
 
+DOCKER_TEST_IMAGE=backpack-test
+DOCKER_TEST_DOCKERFILE=testdata/Dockerfile
+
 all: ${NAME}
 
-setup:
-	go get -d -t -v ./...
-
-test: setup
-	go test ./...
+test:
+	docker build -t $(DOCKER_TEST_IMAGE) -f $(DOCKER_TEST_DOCKERFILE) .
+	docker run --rm -it -v $(CURDIR):/go/src/$(PACKAGE) $(DOCKER_TEST_IMAGE)
 
 style:
 	gofmt -w .
