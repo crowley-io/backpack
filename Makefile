@@ -27,8 +27,7 @@ style:
 	gofmt -w .
 
 lint:
-	golint .
-	golint ./engine
+	gometalinter --vendor --disable=gotype --tests ./...
 
 ${NAME}:
 	go build -ldflags ${LDFLAGS} -o ${NAME}
