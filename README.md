@@ -37,6 +37,23 @@ make test
 
 Note that test cases are run in a **Docker container**, so you need to install `docker` first.
 
+## Linting
+
+backpack use [gometalinter](https://github.com/alecthomas/gometalinter).
+
+### Install
+
+```console
+go get -u github.com/alecthomas/gometalinter
+gometalinter --install --update
+```
+
+### Usage
+
+```console
+make lint
+```
+
 ## Inspirations
 
 * [`gosu`](https://github.com/tianon/gosu)
