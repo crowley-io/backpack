@@ -43,7 +43,7 @@ backpack use [gometalinter](https://github.com/alecthomas/gometalinter).
 
 ### Install
 
-```bash
+```console
 go get -u github.com/alecthomas/gometalinter
 gometalinter --install --update
 ```
