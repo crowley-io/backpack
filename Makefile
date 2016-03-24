@@ -27,7 +27,8 @@ style:
 	gofmt -w .
 
 lint:
-	gometalinter --vendor --disable=gotype --tests ./...
+	gometalinter --vendor --disable=gotype --enable=lll --enable=gofmt \
+		--dupl-threshold=80 --deadline=10s --line-length=120 --tests ./...
 
 ${NAME}:
 	go build -ldflags ${LDFLAGS} -o ${NAME}
